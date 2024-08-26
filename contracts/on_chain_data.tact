@@ -4,7 +4,7 @@ import "@stdlib/ownable";
 import "./json.tact";
 //one unable to do this...
 //const data: String = readFile("./image.webp");
-//so have to do this
+
 struct GetNftData {
     is_initialized: Bool;
     index: Int;
