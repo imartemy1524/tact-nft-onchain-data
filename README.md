@@ -1,4 +1,4 @@
-# OnChainData
+# NFT onchain hardcoded data
 
 ## Project structure
 
@@ -7,20 +7,9 @@
 -   `tests` - tests for the contracts.
 -   `scripts` - scripts used by the project, mainly the deployment scripts.
 
-## How to use
+## What is this project about?
 
-### Build
+In this project, one tries to implement onchain NFT data generation and serialization.
 
-`npx blueprint build` or `yarn blueprint build`
+But unfortunately, it is not yet possible to compile non-utf8 strings in TACT, which leads to the impossibility of hardcoding JPEG/PNG file directly into the smart contract.
 
-### Test
-
-`npx blueprint test` or `yarn blueprint test`
-
-### Deploy or run another script
-
-`npx blueprint run` or `yarn blueprint run`
-
-### Add a new contract
-
-`npx blueprint create ContractName` or `yarn blueprint create ContractName`

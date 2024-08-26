@@ -215,6 +215,7 @@ contract OnChainDataNFT with Deployable, Ownable {
         };
     }
     get fun avatar_binary(): String{
+        //this actially returns NOT a binary data, but a UTF-8 string instead... ???? How to get binary data from a file as a string, or whatever?
         return img;
     }
 }
