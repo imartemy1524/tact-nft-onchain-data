@@ -155,8 +155,8 @@ export function  decodeNftDataOnchain(data: Cell): NftData {
             let v = value!.toString();
             value = JSON.parse(v);
         }
-        else //if(realKey != 'image_data')
-            value = Buffer.from(value!.toString(), 'binary');
+        // else
+        //     value = Buffer.from(value!.toString(), 'binary');
 
         //@ts-ignore
         realGoodObject[realKey! as unknown as 'image'] = value!;

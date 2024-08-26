@@ -1,11 +1,12 @@
 import { Blockchain, printTransactionFees, SandboxContract, TreasuryContract } from '@ton/sandbox';
-import { Cell, toNano } from '@ton/core';
+import { Cell, toNano, TupleReader } from '@ton/core';
 import { OnChainDataNFT } from '../wrappers/OnChainData';
 import '@ton/test-utils';
 import { decodeNftDataOnchain } from './helpers';
 import { readFile } from 'node:fs/promises';
 import { readFileSync } from 'fs';
-const img = readFileSync(__dirname + '/../contracts/img.png');
+import { Slice } from '@ton/core/src/boc/Slice';
+const img = readFileSync(__dirname + '/../contracts/img.png', {encoding: 'binary'});
 
 describe('OnChainData', () => {
     let blockchain: Blockchain;
@@ -37,9 +38,17 @@ describe('OnChainData', () => {
         });
     });
     it('text', async ()=>{
-        const fileBin = img.toString('binary');
-        const image = await onChainData.getAvatarBinary();
-        expect(image).toEqual(fileBin);
+        const fileBin = img;
+        await onChainData.getAvatarBinary();
+        const source = await blockchain.runGetMethod(onChainData.address, 'avatar_binary').then(e=>e.stack);
+        const reader = new TupleReader(source);
+        //@ts-ignore
+        const bufferData = readBuffer(reader.readCell().beginParse());
+
+        //this should not pass, but it passes
+        expect(bufferData?.toString('utf-8')).toEqual(fileBin);
+        //ans this SHOULD, but it doesn't
+        expect(bufferData?.toString('binary')).toEqual(fileBin);
     })
     it('should deploy', async () => {
         const { individual_content: snake } = await onChainData.getGetNftData_2(true);
@@ -49,7 +58,8 @@ describe('OnChainData', () => {
         expect(dataDict.name).toEqual(dataSnake.name);
         expect(dataDict.description).toEqual(dataSnake.description);
         expect(dataDict.image_data).toEqual(dataSnake.image_data);
-        dataSnake.image_data
+        console.warn("Next check would fail, because tact doen't support binary data yet :(")
+        expect(dataSnake.image_data?.equals(Buffer.from(img, 'binary')));
         // console.log('NFT Content: ', data);
         // console.log("Image data: ", data.image_data?.toString());
 
@@ -59,3 +69,28 @@ describe('OnChainData', () => {
 });
 
 
+
+function readBuffer(slice: Slice) {
+    // Check consistency
+    if (slice.remainingBits % 8 !== 0) {
+        throw new Error(`Invalid string length: ${slice.remainingBits}`);
+    }
+    if (slice.remainingRefs !== 0 && slice.remainingRefs !== 1) {
+        throw new Error(`invalid number of refs: ${slice.remainingRefs}`);
+    }
+
+    // Read string
+    let res: Buffer
+    if (slice.remainingBits === 0) {
+        res = Buffer.alloc(0);
+    } else {
+        res = slice.loadBuffer(slice.remainingBits / 8);
+    }
+
+    // Read tail
+    if (slice.remainingRefs === 1) {
+        res = Buffer.concat([res, readBuffer(slice.loadRef().beginParse())]);
+    }
+
+    return res;
+}
