@@ -37,7 +37,7 @@ describe('OnChainData', () => {
             success: true,
         });
     });
-    it('text', async ()=>{
+    it('check binary data', async ()=>{
         const fileBin = img;
         // under the hood one decodes buffer as utf-8 string
         const invalidBinary = await onChainData.getAvatarBinary();
@@ -54,7 +54,7 @@ describe('OnChainData', () => {
         //ans this SHOULD, but it doesn't
         expect(bufferData?.toString('binary')).toEqual(fileBin);
     })
-    it('should deploy', async () => {
+    it('compare different HFT data formats', async () => {
         const { individual_content: snake } = await onChainData.getGetNftData_2(true);
         const {individual_content: dict} = await onChainData.getGetNftData_2(false);
         const dataSnake = decodeNftDataOnchain(snake);
