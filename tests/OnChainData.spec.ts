@@ -39,7 +39,10 @@ describe('OnChainData', () => {
     });
     it('text', async ()=>{
         const fileBin = img;
-        await onChainData.getAvatarBinary();
+        // under the hood one decodes buffer as utf-8 string
+        const invalidBinary = await onChainData.getAvatarBinary();
+
+        //and here one decodes buffer as binary string
         const source = await blockchain.runGetMethod(onChainData.address, 'avatar_binary').then(e=>e.stack);
         const reader = new TupleReader(source);
         //@ts-ignore
