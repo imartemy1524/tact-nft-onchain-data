@@ -41,6 +41,7 @@ describe('OnChainData', () => {
         const fileBin = img;
         // under the hood one decodes buffer as utf-8 string
         const invalidBinary = await onChainData.getAvatarBinary();
+        expect(invalidBinary).toEqual(fileBin);
 
         //and here one decodes buffer as binary string
         const source = await blockchain.runGetMethod(onChainData.address, 'avatar_binary').then(e=>e.stack);
@@ -60,14 +61,12 @@ describe('OnChainData', () => {
         const dataDict = decodeNftDataOnchain(dict);
         expect(dataDict.name).toEqual(dataSnake.name);
         expect(dataDict.description).toEqual(dataSnake.description);
-        expect(dataDict.image_data).toEqual(dataSnake.image_data);
-        console.warn("Next check would fail, because tact doen't support binary data yet :(")
-        expect(dataSnake.image_data?.equals(Buffer.from(img, 'binary')));
-        // console.log('NFT Content: ', data);
-        // console.log("Image data: ", data.image_data?.toString());
 
-        //read contracts/img.png as buffer
-        // expect(data.image_data?.equals(img)).toBeTruthy();
+        expect(dataDict.image_data).toEqual(dataSnake.image_data);
+        console.warn("Next check would fail, because tact doen't support binary data yet, but it should pass, if one decodes string data as binary string")
+
+        expect(dataDict.image_data?.equals(Buffer.from(img, 'binary'))).toBeTruthy();
+
     });
 });
 
